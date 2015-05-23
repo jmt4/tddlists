@@ -37,7 +37,8 @@ class NewVisitorTest(unittest.TestCase):	#1
 		table = self.browser.find_element_by_id('id_list_table')
 		rows = table.find_elements_by_tag_name('tr')
 		self.assertTrue(
-			any(row.text == '1: Practice Django hard!' for row in rows)
+			any(row.text == '1: Practice Django hard!' for row in rows),
+			"New to-do item did not appear in table"
 		)
 
 		#Another item can easily be added. It is
