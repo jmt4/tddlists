@@ -33,6 +33,7 @@ class NewVisitorTest(unittest.TestCase):
 		self.browser.get('http://localhost:8000')
 
 		#They visit the site. 
+
 		self.assertIn('To-Do', self.browser.title) #5
 		header_text = self.browser.find_element_by_tag_name('h1').text
 		self.assertIn('To-Do', header_text)
@@ -55,6 +56,9 @@ class NewVisitorTest(unittest.TestCase):
 		inputbox.send_keys(Keys.ENTER)
 		self.check_for_row_in_list_table('1: Practice Django hard!')
 		self.check_for_row_in_list_table('2: Practice Django harder!')
+
+		import time
+		time.sleep(5)
 
 		self.fail('Finish the test')	#6 -- this is simply a reminder to finish the test. self.fail automatically fails.
 		#They notice the page title and header mention to-do list
