@@ -2,14 +2,30 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import unittest
 
-class NewVisitorTest(unittest.TestCase):	#1
+class NewVisitorTest(unittest.TestCase):
 
-	def setUp(self):	#2
+	#the setUp() method is overridden from TestCase. It does nothing by itself
+	def setUp(self):
 		self.browser = webdriver.Firefox() #we start the browser here
 		self.browser.implicitly_wait(3) #this makes sure we wait after the browser has been started and ensures the page has loaded
 
-	def tearDown(self):	#3
+	#Similarly, tearDown is inherited from TestCase and overriden with our own functionality here
+	def tearDown(self):
 		self.browser.quit()
+	"""
+	Helper methods -- unless method starts with test_ it isn't run as a test.
+	Thus we can use it to 'help' make the test better.
+	"""
+
+	def check_for_row_in_list_table(self, row_text):
+		table = self.browser.find_element_by_id('id_list_table')
+		rows = table.find_elements_by_tag_name('tr')
+		self.assertIn(row_text, [row.text for row in rows])
+
+
+	"""
+	---Functional Tests---
+	"""
 
 	def test_can_start_a_list_and_retrieve_it_later(self):	#4
 
@@ -28,24 +44,17 @@ class NewVisitorTest(unittest.TestCase):	#1
 			'Enter a to-do item'
 		)
 
-		#They type in "Practice Django hard!"
+		#They type in "Practice Django hard!" into the textbox, then hit enter.
 		inputbox.send_keys('Practice Django hard!')
-
-		#Page updates when enter is hit
 		inputbox.send_keys(Keys.ENTER)
-
-		table = self.browser.find_element_by_id('id_list_table')
-		rows = table.find_elements_by_tag_name('tr')
+		self.check_for_row_in_list_table('1: Practice Django hard!')
 
 		#Another item can easily be added. It is
 		inputbox = self.browser.find_element_by_id('id_new_item')
 		inputbox.send_keys('Practice Django harder!')
 		inputbox.send_keys(Keys.ENTER)
-
-		table = self.browser.find_element_by_id('id_list_table')
-		rows = table.find_elements_by_tag_name('tr')
-		self.assertIn('1: Practice Django hard!', [row.text for row in rows])
-		self.assertIn('2: Practice Django harder!', [row.text for row in rows])
+		self.check_for_row_in_list_table('1: Practice Django hard!')
+		self.check_for_row_in_list_table('2: Practice Django harder!')
 
 		self.fail('Finish the test')	#6 -- this is simply a reminder to finish the test. self.fail automatically fails.
 		#They notice the page title and header mention to-do list
