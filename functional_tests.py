@@ -14,9 +14,9 @@ class NewVisitorTest(unittest.TestCase):	#1
 	def test_can_start_a_list_and_retrieve_it_later(self):	#4
 
 		#Some user wants to check out the homepage of a to-do list web application.
-		#They visit the site. 
 		self.browser.get('http://localhost:8000')
 
+		#They visit the site. 
 		self.assertIn('To-Do', self.browser.title) #5
 		header_text = self.browser.find_element_by_tag_name('h1').text
 		self.assertIn('To-Do', header_text)
@@ -36,12 +36,17 @@ class NewVisitorTest(unittest.TestCase):	#1
 
 		table = self.browser.find_element_by_id('id_list_table')
 		rows = table.find_elements_by_tag_name('tr')
-		self.assertTrue(
-			any(row.text == '1: Practice Django hard!' for row in rows),
-			"New to-do item did not appear in table"
-		)
 
 		#Another item can easily be added. It is
+		inputbox = self.browser.find_element_by_id('id_new_item')
+		inputbox.send_keys('Practice Django harder!')
+		inputbox.send_keys(Keys.ENTER)
+
+		table = self.browser.find_element_by_id('id_list_table')
+		rows = table.find_elements_by_tag_name('tr')
+		self.assertIn('1: Practice Django hard!', [row.text for row in rows])
+		self.assertIn('2: Practice Django harder!', [row.text for row in rows])
+
 		self.fail('Finish the test')	#6 -- this is simply a reminder to finish the test. self.fail automatically fails.
 		#They notice the page title and header mention to-do list
 
