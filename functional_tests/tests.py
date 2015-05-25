@@ -1,8 +1,8 @@
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-import unittest
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
 
 	#the setUp() method is overridden from TestCase. It does nothing by itself
 	def setUp(self):
@@ -30,7 +30,7 @@ class NewVisitorTest(unittest.TestCase):
 	def test_can_start_a_list_and_retrieve_it_later(self):	#4
 
 		#Some user wants to check out the homepage of a to-do list web application.
-		self.browser.get('http://localhost:8000')
+		self.browser.get(self.live_server_url)
 
 		#They visit the site. 
 
@@ -48,6 +48,8 @@ class NewVisitorTest(unittest.TestCase):
 		#They type in "Practice Django hard!" into the textbox, then hit enter.
 		inputbox.send_keys('Practice Django hard!')
 		inputbox.send_keys(Keys.ENTER)
+		jim_list_url = self.browser.current_url
+		self.assertRegex(jim_list_url, '/list/.+')
 		self.check_for_row_in_list_table('1: Practice Django hard!')
 
 		#Another item can easily be added. It is
@@ -57,14 +59,41 @@ class NewVisitorTest(unittest.TestCase):
 		self.check_for_row_in_list_table('1: Practice Django hard!')
 		self.check_for_row_in_list_table('2: Practice Django harder!')
 
-		import time
-		time.sleep(5)
+		#A new user Francis visits the site
+
+		## We use a new browser session to make sure that no information
+		## of Jim's is coming through from the cookies etc.
+		self.browser.quit()
+		self.browser = webdriver.Firefox()
+
+		# Francis vists the home page. There is no sign of Edith's
+		# list
+		self.browser.get(self.live_server_url)
+		page_text = self.browser.find_element_by_tag_name('body').text
+		self.assertNotIn('Practice Django hard!', page_text)
+		self.assertNotIn('Practice Django harder', page_text)
+
+		# Francis starts a new list by entering a new item. He
+		# is less interesting than Jim ...
+		inputbox = self.browser.find_element_by_id('id_new_item')
+		inputbox.send_keys('Buy milk')
+		inputbox.send_keys(Keys.ENTER)
+
+		# Francis gets his own URL
+		francis_list_url = self.browser.current_url
+		self.assertRegex(francis_list_url, '/list/.+')
+		self.assertNotEqual(francis_list_url, jim_list_url)
+
+		# Again, there is no trace of Jim's list
+		page_text = self.browser.find_element_by_tag_name('body').text
+		self.assertNotIn('Practice Django hard!', page_text)
+		self.assertNotIn('Practice Django harder', page_text)
+		self.assertIn('Buy milk', page_text)
+
+		#Satisfied, they both go back to sleep
 
 		self.fail('Finish the test')	#6 -- this is simply a reminder to finish the test. self.fail automatically fails.
-		#They notice the page title and header mention to-do list
 
-		#Page updates
 
-		#They wonder if the items will be retained for future reference. In our app: Of course they will becaue they make an account
-if __name__ == '__main__':	#7
-	unittest.main(warnings='ignore')	#8
+#if __name__ == '__main__':	#7
+#	unittest.main(warnings='ignore')	#8
