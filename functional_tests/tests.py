@@ -56,8 +56,9 @@ class NewVisitorTest(LiveServerTestCase):
 		inputbox = self.browser.find_element_by_id('id_new_item')
 		inputbox.send_keys('Practice Django harder!')
 		inputbox.send_keys(Keys.ENTER)
-		self.check_for_row_in_list_table('1: Practice Django hard!')
+	
 		self.check_for_row_in_list_table('2: Practice Django harder!')
+		self.check_for_row_in_list_table('1: Practice Django hard!')
 
 		#A new user Francis visits the site
 
