@@ -49,7 +49,7 @@ class NewVisitorTest(LiveServerTestCase):
 		inputbox.send_keys('Practice Django hard!')
 		inputbox.send_keys(Keys.ENTER)
 		jim_list_url = self.browser.current_url
-		self.assertRegex(jim_list_url, '/list/.+')
+		self.assertRegex(jim_list_url, '/lists/.+')
 		self.check_for_row_in_list_table('1: Practice Django hard!')
 
 		#Another item can easily be added. It is
@@ -81,7 +81,7 @@ class NewVisitorTest(LiveServerTestCase):
 
 		# Francis gets his own URL
 		francis_list_url = self.browser.current_url
-		self.assertRegex(francis_list_url, '/list/.+')
+		self.assertRegex(francis_list_url, '/lists/.+')
 		self.assertNotEqual(francis_list_url, jim_list_url)
 
 		# Again, there is no trace of Jim's list
