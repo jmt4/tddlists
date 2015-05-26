@@ -71,7 +71,7 @@ class NewVisitorTest(LiveServerTestCase):
 		self.browser.get(self.live_server_url)
 		page_text = self.browser.find_element_by_tag_name('body').text
 		self.assertNotIn('Practice Django hard!', page_text)
-		self.assertNotIn('Practice Django harder', page_text)
+		self.assertNotIn('Practice Django harder!', page_text)
 
 		# Francis starts a new list by entering a new item. He
 		# is less interesting than Jim ...
@@ -87,12 +87,12 @@ class NewVisitorTest(LiveServerTestCase):
 		# Again, there is no trace of Jim's list
 		page_text = self.browser.find_element_by_tag_name('body').text
 		self.assertNotIn('Practice Django hard!', page_text)
-		self.assertNotIn('Practice Django harder', page_text)
+		self.assertNotIn('Practice Django harder!', page_text)
 		self.assertIn('Buy milk', page_text)
 
 		#Satisfied, they both go back to sleep
 
-		self.fail('Finish the test')	#6 -- this is simply a reminder to finish the test. self.fail automatically fails.
+		self.fail('Finish the test!')	#6 -- this is simply a reminder to finish the test. self.fail automatically fails.
 
 
 #if __name__ == '__main__':	#7
