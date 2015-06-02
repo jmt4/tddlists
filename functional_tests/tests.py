@@ -16,7 +16,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
 	@classmethod
 	def tearDownClass(cls):
-		if cls.server_url = cls.live_server_url:
+		if cls.server_url == cls.live_server_url:
 			super().tearDownClass()
 
 	#the setUp() method is overridden from TestCase. It does nothing by itself
