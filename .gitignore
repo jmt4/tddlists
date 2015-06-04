@@ -1,4 +1,5 @@
+database/lists_db
+redux_migrations/
 db.sqlite3
 __pycache__
 *.pyc
-redux_migrations/
