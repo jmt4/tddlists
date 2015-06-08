@@ -16,7 +16,7 @@ class NewVisitorTest(FunctionalTest):
 		self.assertIn('To-Do', header_text)
 
 		#They are allowed to create an item "to-do" immediately
-		inputbox = self.browser.find_element_by_id('id_new_item')
+		inputbox = self.get_item_input_box()
 		self.assertEqual(
 			inputbox.get_attribute('placeholder'),
 			'Enter a to-do item'
@@ -30,7 +30,7 @@ class NewVisitorTest(FunctionalTest):
 		self.check_for_row_in_list_table('1: Practice Django hard!')
 
 		#Another item can easily be added. It is
-		inputbox = self.browser.find_element_by_id('id_new_item')
+		inputbox = self.get_item_input_box()
 		inputbox.send_keys('Practice Django harder!')
 		inputbox.send_keys(Keys.ENTER)
 	
@@ -53,7 +53,7 @@ class NewVisitorTest(FunctionalTest):
 
 		# Francis starts a new list by entering a new item. He
 		# is less interesting than Jim ...
-		inputbox = self.browser.find_element_by_id('id_new_item')
+		inputbox = self.get_item_input_box()
 		inputbox.send_keys('Buy milk')
 		inputbox.send_keys(Keys.ENTER)
 
