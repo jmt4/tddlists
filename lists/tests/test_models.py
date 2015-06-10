@@ -1,13 +1,11 @@
+import hashlib
+
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from lists.models import Item, List
 
-class ListAndItemModelTest(TestCase):
-
-	def test_get_absolute_url(self):
-		list_ = List.objects.create()
-		self.assertEqual(list_.get_absolute_url(), '/lists/%d/' % (list_.id,))
-
+class ItemModelTest(TestCase):
+	
 	def test_cannot_save_empty_list_items(self):
 		list_ = List.objects.create()
 		item = Item(list=list_, text='')
@@ -15,43 +13,43 @@ class ListAndItemModelTest(TestCase):
 			item.save()
 			item.full_clean()
 
-	def test_saving_and_retrieving_items(self):
-		"""
-		Below we are creating two Items, setting the text field in the model to some string,
-		and, finally, saving them.
-		"""
-		list_ = List()
-		list_.save()
+	def test_default_text(self):
+		item = Item()
+		self.assertEqual(item.text, '')
 
-		first_item = Item()
-		first_item.text = 'The first (ever) list item'
-		first_item.list = list_
-		first_item.save()
+	def test_item_is_related_to_list(self):
+		list_ = List.objects.create()
+		item = Item()
+		item.list = list_
+		item.save()
+		self.assertIn(item, list_.item_set.all())
 
-		second_item = Item()
-		second_item.text = 'The second item'
-		second_item.list = list_
-		second_item.save()
+	def test_duplicate_items_are_invalid(self):
+		list_ = List.objects.create()
+		item1 = Item.objects.create(list=list_, text='bla')
+		item1.hash_text_field()
+		item1.save()
+		with self.assertRaises(ValidationError):
+			item2 = Item(list=list_, text='bla')
+			item2.hash_text_field()
+			item2.full_clean()
 
-		saved_list = List.objects.first()
-		self.assertEqual(saved_list, list_)
+	
+	def test_CAN_save_same_item_to_different_lists(self):
+		list1 = List.objects.create()
+		list2 = List.objects.create()
+		Item.objects.create(list=list1, text='bla')
+		item = Item(list=list2, text='bla')
+		item.full_clean() # This should not raise an error
 
-		#returns QuerySet
-		saved_items = Item.objects.all()
-		"""
-		The count method hits the database and returns the number of records.
-		This is preferable if the QuerySet isn't cached (i.e stored in a variable)
-		because we dont need to iterate over all the objects anyways.
-		"""
-		self.assertEqual(saved_items.count(), 2)
+	def test_item_hashes_correctly(self):
+		item = Item(text='hash me')
+		item.hash_text_field()
+		m = hashlib.md5('hash me'.encode('utf-8'))
+		self.assertEqual(item.text_hash, m.hexdigest())
 
-		first_saved_item = saved_items[0]
-		second_saved_item = saved_items[1]
-		"""
-		Need to grab text with .text because we assign the objects, not their variables
-		above.
-		"""
-		self.assertEqual(first_saved_item.text, first_item.text)
-		self.assertEqual(first_saved_item.list, list_)
-		self.assertEqual(second_saved_item.text, second_item.text)
-		self.assertEqual(second_saved_item.list, list_)
+class ListModelTest(TestCase):
+
+	def test_get_absolute_url(self):
+		list_ = List.objects.create()
+		self.assertEqual(list_.get_absolute_url(), '/lists/%d/' % (list_.id,))

@@ -80,11 +80,19 @@ class ListViewTest(TestCase):
 
 	def test_displays_only_items_for_that_list(self):
 		correct_list = List.objects.create()
-		Item.objects.create(text='itemey 1', list=correct_list)
-		Item.objects.create(text='itemey 2', list=correct_list)
+		item1 = Item.objects.create(text='itemey 1', list=correct_list)
+		item1.hash_text_field()
+		item1.save()
+		item2 = Item.objects.create(text='itemey 2', list=correct_list)
+		item2.hash_text_field()
+		item2.save()
 		other_list = List.objects.create()
-		Item.objects.create(text='other item 1', list=other_list)
-		Item.objects.create(text='other item 2', list=other_list)
+		item1 = Item.objects.create(text='other item 1', list=other_list)
+		item1.hash_text_field()
+		item1.save()
+		item2 = Item.objects.create(text='other item 2', list=other_list)
+		item2.hash_text_field()
+		item2.save()
 
 		response = self.client.get('/lists/%d/' % (correct_list.id))
 

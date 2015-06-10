@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.urlresolvers import reverse
+import hashlib
 
 # Create your models here.
 """
@@ -14,3 +15,16 @@ class List(models.Model):
 class Item(models.Model):
 	text = models.TextField(default='')
 	list = models.ForeignKey(List, default=None)
+	text_hash = models.CharField(default='', max_length=256, blank=True)
+
+	class Meta:
+		ordering = ('id',)
+		unique_together = ('list', 'text_hash')
+
+	def __str__(self):
+		return self.text
+	
+	def hash_text_field(self):
+		hash = hashlib.md5(self.text.encode('utf-8')).hexdigest()
+		self.text_hash = hash if len(hash) < 257 else hash[:256]
+		#return hash if len(hash) < 257 else hash[:256]
