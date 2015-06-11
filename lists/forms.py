@@ -23,14 +23,17 @@ class ItemForm(forms.models.ModelForm):
 
 	def save(self, for_list):
 		self.instance.list = for_list
-		self.instance.hash_text_field()
-		return super().save()
+		k = super().save()
+		return k
 
 class ExistingListItemForm(ItemForm):
 
 	def __init__(self, for_list, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.instance.list = for_list
+		if self.data:
+			self.instance.text = self.data['text']
+		self.instance.hash_text_field()
 
 	def validate_unique(self):
 		try:
