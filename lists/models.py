@@ -21,6 +21,10 @@ class Item(models.Model):
 		ordering = ('id',)
 		unique_together = ('list', 'text_hash')
 
+	def save(self, *args, **kwargs):
+		self.hash_text_field()
+		super(Item, self).save(*args, **kwargs)
+
 	def __str__(self):
 		return self.text
 	

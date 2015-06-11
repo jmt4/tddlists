@@ -4,6 +4,7 @@ from django.template import Context
 from django.test import TestCase
 from django.http import HttpRequest
 from django.utils.html import escape
+from unittest import skip
 
 from lists.views import home_page
 from lists.models import Item, List
@@ -80,19 +81,11 @@ class ListViewTest(TestCase):
 
 	def test_displays_only_items_for_that_list(self):
 		correct_list = List.objects.create()
-		item1 = Item.objects.create(text='itemey 1', list=correct_list)
-		item1.hash_text_field()
-		item1.save()
-		item2 = Item.objects.create(text='itemey 2', list=correct_list)
-		item2.hash_text_field()
-		item2.save()
+		Item.objects.create(text='itemey 1', list=correct_list)
+		Item.objects.create(text='itemey 2', list=correct_list)
 		other_list = List.objects.create()
-		item1 = Item.objects.create(text='other item 1', list=other_list)
-		item1.hash_text_field()
-		item1.save()
-		item2 = Item.objects.create(text='other item 2', list=other_list)
-		item2.hash_text_field()
-		item2.save()
+		Item.objects.create(text='other item 1', list=other_list)
+		Item.objects.create(text='other item 2', list=other_list)
 
 		response = self.client.get('/lists/%d/' % (correct_list.id))
 
@@ -157,3 +150,17 @@ class ListViewTest(TestCase):
 	def test_for_invalid_input_shows_error_on_page(self):
 		response = self.post_invalid_input()
 		self.assertContains(response, escape(EMPTY_ITEM_ERROR))
+	
+	@skip
+	def test_duplicate_item_validation_errors_end_up_on_lists_page(self):
+		list1 = List.objects.create()
+		Item.objects.create(list=list1, text='textey')
+		response = self.client.post(
+			'lists/%d/' % (list1.id,),
+			data={'text': 'textey'} 
+		)
+
+		expected_error = escape("You've already got this in your list")
+		self.assertContains(response, expected_error)
+		self.assertTemplateUsed(response, 'lists/list.html')
+		self.assertEqual(Item.objects.all().count(), 1)

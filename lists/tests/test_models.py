@@ -27,8 +27,6 @@ class ItemModelTest(TestCase):
 	def test_duplicate_items_are_invalid(self):
 		list_ = List.objects.create()
 		item1 = Item.objects.create(list=list_, text='bla')
-		item1.hash_text_field()
-		item1.save()
 		with self.assertRaises(ValidationError):
 			item2 = Item(list=list_, text='bla')
 			item2.hash_text_field()
