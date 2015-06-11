@@ -41,8 +41,9 @@ class ItemModelTest(TestCase):
 		item.full_clean() # This should not raise an error
 
 	def test_item_hashes_correctly(self):
-		item = Item(text='hash me')
-		item.hash_text_field()
+		list_ = List.objects.create()
+		item = Item.objects.create(text='hash me', list=list_)
+		#item.hash_text_field()
 		m = hashlib.md5('hash me'.encode('utf-8'))
 		self.assertEqual(item.text_hash, m.hexdigest())
 

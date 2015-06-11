@@ -27,7 +27,7 @@ class Item(models.Model):
 
 	def __str__(self):
 		return self.text
-	
+
 	def hash_text_field(self):
 		hash = hashlib.md5(self.text.encode('utf-8')).hexdigest()
 		self.text_hash = hash if len(hash) < 257 else hash[:256]
