@@ -43,7 +43,6 @@ class ItemModelTest(TestCase):
 	def test_item_hashes_correctly(self):
 		list_ = List.objects.create()
 		item = Item.objects.create(text='hash me', list=list_)
-		#item.hash_text_field()
 		m = hashlib.md5('hash me'.encode('utf-8'))
 		self.assertEqual(item.text_hash, m.hexdigest())
 
