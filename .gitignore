@@ -3,3 +3,4 @@ redux_migrations/
 db.sqlite3
 __pycache__
 *.pyc
+node_modules/
