@@ -1,5 +1,7 @@
 from .base import FunctionalTest
+
 from unittest import skip
+from selenium.webdriver.common.action_chains import ActionChains
 
 class ItemValidationTest(FunctionalTest):
 
@@ -64,6 +66,27 @@ class ItemValidationTest(FunctionalTest):
 
 		# She starts typing in the input box to clear the error
 		self.get_item_input_box().send_keys('a')
+
+		# She is pleased to see that the error message disappears
+		error = self.get_error_element()
+		self.assertFalse(error.is_displayed())
+
+	def test_error_messages_are_cleared_when_input_box_is_clicked_on(self):
+		# Edith starts a new list in a way that causes a validation error:
+		self.browser.get(self.server_url)
+		self.get_item_input_box().send_keys('\n')
+		error = self.get_error_element()
+		self.assertTrue(error.is_displayed())
+
+		# She clicks on the input box to clear the error message
+		import time
+		inputbox = self.get_item_input_box()
+		actions = ActionChains(self.browser)
+		actions.move_to_element(inputbox).perform()
+		time.sleep(1)
+		actions.click(inputbox).perform()
+		time.sleep(1)
+		#actions.perform()
 
 		# She is pleased to see that the error message disappears
 		error = self.get_error_element()
