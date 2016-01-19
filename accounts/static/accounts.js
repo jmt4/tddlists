@@ -4,13 +4,13 @@
 
 window.Superlists = {
 	Accounts: {
-		initialize: function (navigator) {
+		initialize: function (navigator, user, token, urls) {
 			$('#id_login').on('click', function () {
 				navigator.id.request();
 			});
 
 			navigator.id.watch({
-				loggedInUser: 'current user',
+				loggedInUser: user,
 				onlogin: function(assertion) { 
 					$.post(urls.login, { assertion: assertion, csrfmiddlewaretoken: token })
 					 .done(function () { window.location.reload(); })
@@ -20,4 +20,4 @@ window.Superlists = {
 			});
 		}
 	}
-}
+};
