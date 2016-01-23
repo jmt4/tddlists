@@ -1,10 +1,10 @@
 import requests
 
 PERSONA_VERIFY_URL = 'https://verifier.login.persona.org/verify'
-DOMAIN = 'localhost'
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth import models
+from django.conf import settings
 User = get_user_model()
 
 class PersonaAuthenticationBackend(object):
@@ -12,7 +12,7 @@ class PersonaAuthenticationBackend(object):
 	def authenticate(self, assertion):
 		resp = requests.post(
 			PERSONA_VERIFY_URL, 
-			data={'audience': DOMAIN, 'assertion': assertion}
+			data={'audience': settings.DOMAIN, 'assertion': assertion}
 		)
 		
 		if resp.ok and resp.json()['status'] == 'okay':
