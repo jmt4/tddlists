@@ -4,15 +4,20 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 import sys
 
+from .server_tools import reset_database
+
 class FunctionalTest(StaticLiveServerTestCase):
 
 	@classmethod
 	def setUpClass(cls):
 		for arg in sys.argv:
 			if 'liveserver' in arg:
-				cls.server_url = 'http://' + arg.split('=')[1]
+				cls.server_host = arg.split('=')[1]
+				cls.server_url = 'http://' + cls.server_host
+				cls.against_staging = True
 				return
 		super().setUpClass()
+		cls.against_staging = False
 		cls.server_url = cls.live_server_url
 
 	@classmethod
@@ -22,6 +27,8 @@ class FunctionalTest(StaticLiveServerTestCase):
 
 	#the setUp() method is overridden from TestCase. It does nothing by itself
 	def setUp(self):
+		if self.against_staging:
+			reset_database(self.server_host)
 		self.browser = webdriver.Firefox() #we start the browser here
 		self.browser.implicitly_wait(3) #this makes sure we wait after the browser has been started and ensures the page has loaded
 
@@ -57,4 +64,5 @@ class FunctionalTest(StaticLiveServerTestCase):
 	def wait_to_be_logged_out(self, email):
 		self.wait_for_element_with_id('id_login')
 		navbar = self.browser.find_element_by_css_selector('.navbar')
-		self.assertNotIn(email, navbar.text)
+		self.assertNotIn(email
+			, navbar.text)
