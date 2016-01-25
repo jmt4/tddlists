@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'lists',
     'accounts',
+    'functional_tests',
 )
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -82,10 +83,12 @@ WSGI_APPLICATION = 'superlists.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
+DB_NAME = "lists_db"
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'lists_db',
+        'NAME': DB_NAME,
         'USER': 'jim',
         'PASSWORD': 'slophound',
         'HOST': '127.0.0.1',
