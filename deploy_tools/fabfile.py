@@ -35,7 +35,7 @@ def _update_settings(source_folder, site_name):
 	sed(settings_path, "DEBUG = True", "DEBUG = False")
 	sed(settings_path, 'DOMAIN = "localhost"', 'DOMAIN = "%s"' % (site_name,))
 	if 'staging' in site_name:
-		sed(settings_path, "DB_NAME = lists_db", "DB_NAME = staging_lists_db")
+		sed(settings_path, 'DB_NAME = "lists_db"', 'DB_NAME = "staging_lists_db"')
 	secret_key_file = source_folder + '/superlists/secret_key.py'
 	if not exists(secret_key_file):
 		chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
