@@ -11,7 +11,7 @@ class FunctionalTest(StaticLiveServerTestCase):
 	@classmethod
 	def setUpClass(cls):
 		for arg in sys.argv:
-			if 'liveserver' in arg:
+			if 'liveserver' in arg: 
 				cls.server_host = arg.split('=')[1]
 				cls.server_url = 'http://' + cls.server_host
 				cls.against_staging = True
@@ -22,7 +22,7 @@ class FunctionalTest(StaticLiveServerTestCase):
 
 	@classmethod
 	def tearDownClass(cls):
-		if cls.server_url == cls.live_server_url:
+		if not cls.against_staging:
 			super().tearDownClass()
 
 	#the setUp() method is overridden from TestCase. It does nothing by itself
