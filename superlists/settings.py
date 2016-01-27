@@ -130,7 +130,13 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['console',],
+            'handlers': ['console'],
+        },
+        'accounts': {
+            'handlers': ['console'],
+        },
+        'lists': {
+            'handlers': ['console'],
         },
     },
     'root': {'level': 'INFO'},

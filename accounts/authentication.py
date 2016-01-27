@@ -7,6 +7,9 @@ from django.contrib.auth import models
 from django.conf import settings
 User = get_user_model()
 
+import logging
+logger = logging.getLogger(__name__)
+
 class PersonaAuthenticationBackend(object):
 	
 	def authenticate(self, assertion):
@@ -21,6 +24,10 @@ class PersonaAuthenticationBackend(object):
 				return User.objects.get(email=email)
 			except User.DoesNotExist:
 				return User.objects.create(email=email)
+		else:
+			logger.warning(
+				'Persona says no. Json was: {}'.format(resp.json())
+			)
 
 	def get_user(self, email):
 		try:
