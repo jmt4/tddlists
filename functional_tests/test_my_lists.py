@@ -24,7 +24,8 @@ class MyListsTest(FunctionalTest):
 
 		# She sees that her list is in there, named accoring to its
 		# first list item
-		self.browser.find_element_by_link_text('Reticulate splines').click()
+		#self.browser.find_element_by_link_text('Reticulate splines').click()
+		self.browser.execute_script("document.getElementById('id_list_1').click()")
 		self.assertEqual(self.browser.current_url, first_list_url)
 
 		# She decides to start another list, just to see
@@ -34,13 +35,16 @@ class MyListsTest(FunctionalTest):
 
 		# Under "My lists", her new list appears
 		self.browser.find_element_by_link_text("My lists").click()
-		self.browser.find_element_by_link_text("Click cows").click()
+		#self.browser.find_element_by_link_text("Click cows").click()
+		self.browser.execute_script("document.getElementById('id_list_2').click()")
 		self.assertEqual(self.browser.current_url, second_list_url)
 
 		# She logs out. The "My lists" option disappears
-		self.browser.find_element_by_id('id_logout').click()
+		self.browser.execute_script("document.getElementById('id_logout').click()")
+		#self.browser.find_element_by_id('id_logout').click()
+		#import time; time.sleep(2)
 		self.assertEqual(
-			self.browser.find_element_by_link_text('My lists'),
+			self.browser.find_elements_by_link_text('My lists'),
 			[]
 		)
 
