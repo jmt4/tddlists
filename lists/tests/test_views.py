@@ -5,9 +5,12 @@ from django.test import TestCase
 from django.http import HttpRequest
 from django.utils.html import escape
 from django.contrib.auth import get_user_model
-from unittest import skip
 
-from lists.views import home_page, new_list
+import unittest
+from unittest import skip
+from unittest.mock import Mock, patch
+
+from lists.views import home_page, new_list, new_list2
 from lists.models import Item, List
 from lists.forms import (
 	EMPTY_ITEM_ERROR, DUPLICATE_ITEM_ERROR, 
@@ -166,23 +169,12 @@ class ListViewTest(TestCase):
 		)
 
 		expected_error = escape("You've already got this in your list")
-		#import pdb; pdb.set_trace()
+
 		self.assertContains(response, expected_error)
 		self.assertTemplateUsed(response, 'lists/list.html')
 		self.assertEqual(Item.objects.all().count(), 1)
 
-class MyListsTest(TestCase):
-
-	def test_my_lists_url_renders_my_lists_template(self):
-		User.objects.create(email='a@b.com')
-		response = self.client.get('/lists/users/a@b.com/')
-		self.assertTemplateUsed(response, 'lists/my_lists.html')
-
-	def test_correct_owner_is_passed_to_view(self):
-		User.objects.create(email='wrong@owner.com')
-		correct_user = User.objects.create(email='a@b.com')
-		response = self.client.get('/lists/users/a@b.com/')
-		self.assertEqual(response.context['owner'], correct_user)
+class MyListsIntegratedTest(TestCase):
 
 	def test_list_owner_is_saved_if_user_is_authenticated(self):
 		request = HttpRequest()
@@ -191,3 +183,56 @@ class MyListsTest(TestCase):
 		new_list(request)
 		list_ = List.objects.first()
 		self.assertEqual(list_.owner, request.user)
+
+@patch('lists.views.NewListForm')
+class NewListViewUnitTest(unittest.TestCase):
+
+	def setUp(self):
+		self.request = HttpRequest()
+		self.request.POST['text'] = 'this is text'
+		self.request.user = User()
+
+		self.message = "Method should not be called. Called {times} times!"
+
+	def test_passes_POST_data_to_NewListForm(self, mockNewListForm):
+		new_list(self.request)
+		mockNewListForm.assert_called_once_with(data=self.request.POST)
+
+	def test_saves_form_with_owner_if_form_is_valid(self, mockNewListForm):
+		mock_form = mockNewListForm.return_value
+		mock_form.is_valid.return_value = True
+		new_list(self.request)
+		mock_form.save.assert_called_once_with(owner=self.request.user)
+
+	def test_save_not_called_if_form_is_invalid(self, mockNewListForm):
+		mock_form = mockNewListForm.return_value
+		mock_form.is_valid.return_value = False
+		new_list(self.request)
+		self.assertFalse(mock_form.save.called,
+						 self.message.format(times=mockNewListForm.call_count))
+
+	@patch('lists.views.redirect')
+	def test_redirects_to_form_returned_object_if_form_valid(
+		self, mock_redirect, mockNewListForm
+	):
+		mock_form = mockNewListForm.return_value
+		mock_form.is_valid.return_value = True
+
+		response = new_list(self.request)
+
+		self.assertEqual(response, mock_redirect.return_value)
+		mock_redirect.assert_called_once_with(mock_form.save.return_value)
+
+	@patch('lists.views.render')
+	def test_renders_home_template_with_form_if_form_invalid(
+		self, mock_render, mockNewListForm
+	):
+		mock_form = mockNewListForm.return_value
+		mock_form.is_valid.return_value = False
+		
+		response = new_list(self.request)
+		
+		self.assertEqual(response, mock_render.return_value)
+		mock_render.assert_called_once_with(
+			self.request, 'lists/home.html', {'form': mock_form}
+		)
