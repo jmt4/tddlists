@@ -1,12 +1,15 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import WebDriverException
 
-import sys, os
+import sys, os, time
 
 from .server_tools import reset_database
 
 from datetime import datetime
+
+DEFAULT_WAIT = 5
 
 SCREEN_DUMP_LOCATION = os.path.join(
 	os.path.dirname(os.path.abspath(__file__)), 'screendumps'
@@ -31,14 +34,18 @@ class FunctionalTest(StaticLiveServerTestCase):
 		if not cls.against_staging:
 			super().tearDownClass()
 
-	#the setUp() method is overridden from TestCase. It does nothing by itself
+	# the setUp() method is overridden from TestCase. It does nothing by itself
 	def setUp(self):
 		if self.against_staging:
 			reset_database(self.server_host)
-		self.browser = webdriver.Firefox() #we start the browser here
-		self.browser.implicitly_wait(3) #this makes sure we wait after the browser has been started and ensures the page has loaded
+		# we start the browser here
+		self.browser = webdriver.Firefox()
+		# this makes sure we wait after the browser has 
+		# been started and ensures the page has loaded
+		self.browser.implicitly_wait(DEFAULT_WAIT)
 
-	#Similarly, tearDown is inherited from TestCase and overriden with our own functionality here
+	# Similarly, tearDown is inherited from TestCase and overriden 
+	# with our own functionality here
 	def tearDown(self):
 		if self._test_has_failed():
 			if not os.path.exists(SCREEN_DUMP_LOCATION):
@@ -91,6 +98,16 @@ class FunctionalTest(StaticLiveServerTestCase):
 	def get_item_input_box(self):
 		return self.browser.find_element_by_id('id_text')
 
+	def wait_for(self, func_with_assertion, timeout=DEFAULT_WAIT):
+		start_time = time.time()
+		while time.time() - start_time < timeout:
+			try:
+			return func_with_assertion()
+			except (AssertionError, WebDriverException):
+				time.sleep(0.1)
+		# one more call will raise any outstanding errors
+		return func_with_assertion()
+
 	def wait_for_element_with_id(self, element_id):
 		WebDriverWait(self.browser, timeout=30).until(
 			lambda b: b.find_element_by_id(element_id),
@@ -107,5 +124,4 @@ class FunctionalTest(StaticLiveServerTestCase):
 	def wait_to_be_logged_out(self, email):
 		self.wait_for_element_with_id('id_login')
 		navbar = self.browser.find_element_by_css_selector('.navbar')
-		self.assertNotIn(email
-			, navbar.text)
+		self.assertNotIn(email, navbar.text)
