@@ -1,7 +1,7 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException, NoSuchElementException
 
 import sys, os, time
 
@@ -108,6 +108,14 @@ class FunctionalTest(StaticLiveServerTestCase):
 		# one more call will raise any outstanding errors
 		return func_with_assertion()
 
+	def wait_for_return_element(self, func_with_link_text, timeout=DEFAULT_WAIT):
+		start_time = time.time()
+		while time.time() - start_time < DEFAULT_WAIT:
+			try:
+				return func_with_link_text()
+			except (WebDriverException, NoSuchElementException):
+				time.sleep(0.1)
+			return func_with_link_text()
 	def wait_for_element_with_id(self, element_id):
 		WebDriverWait(self.browser, timeout=30).until(
 			lambda b: b.find_element_by_id(element_id),
