@@ -102,7 +102,7 @@ class FunctionalTest(StaticLiveServerTestCase):
 		start_time = time.time()
 		while time.time() - start_time < timeout:
 			try:
-			return func_with_assertion()
+				return func_with_assertion()
 			except (AssertionError, WebDriverException):
 				time.sleep(0.1)
 		# one more call will raise any outstanding errors
