@@ -22,27 +22,17 @@ class MyListsTest(FunctionalTest):
 		first_list_url = self.browser.current_url
 
 		# She notices a "My lists" link for the first time
-		self.browser.find_element_by_link_text('My lists').click()
+		self.browser.find_element_by_link_text('My lists').send_keys(Keys.RETURN)
 
 		# She sees that her list is in there, named accoring to its
 		# first list item
-		#self.browser.find_element_by_link_text('Reticulate splines').click()
 		link_element = self.wait_for_return_element(
 			lambda: self.browser.find_element_by_link_text('Reticulate splines')
 		)
 		link_element.send_keys(Keys.RETURN)
-		#self.browser.find_element_by_link_text('Reticulate splines').send_keys(Keys.RETURN)
 		self.wait_for(
 			lambda: self.assertEqual(self.browser.current_url, first_list_url)
 		)
-		#self.browser.execute_script(
-		#	'''document.onreadystatechange = function () {
-		#			if (document.readyState == "complete") {
-		#				document.getElementById("id_list_1").click()
-		#			}
-		#		}'''
-		#)
-		#self.assertEqual(self.browser.current_url, first_list_url)
 
 		# She decides to start another list, just to see
 		self.browser.get(self.server_url)
@@ -51,8 +41,6 @@ class MyListsTest(FunctionalTest):
 
 		# Under "My lists", her new list appears
 		self.browser.find_element_by_link_text("My lists").send_keys(Keys.RETURN)
-		#self.browser.find_element_by_link_text("Click cows").click()
-		#self.browser.execute_script("document.getElementById('id_list_2').click()")
 		link_element = self.wait_for_return_element(
 			lambda: self.browser.find_element_by_link_text('Click cows')
 		)
@@ -60,9 +48,7 @@ class MyListsTest(FunctionalTest):
 		self.assertEqual(self.browser.current_url, second_list_url)
 
 		# She logs out. The "My lists" option disappears
-		self.browser.execute_script("document.getElementById('id_logout').click()")
-		#self.browser.find_element_by_id('id_logout').click()
-		#import time; time.sleep(2)
+		self.browser.find_element_by_id('id_logout').send_keys(Keys.RETURN)
 		self.assertEqual(
 			self.browser.find_elements_by_link_text('My lists'),
 			[]
